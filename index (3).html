@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AVSEC Quality Assurance Risk Assessment</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+:root{
+  --blue:#0b3d91;--cyan:#0097a7;--dark:#08233f;--light:#f4f8fb;--danger:#dc3545;--green:#198754;--orange:#fd7e14;
+}
+*{box-sizing:border-box} body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--light);color:#1b1b1b}
+header{background:linear-gradient(135deg,var(--dark),var(--blue));color:white;padding:16px 22px;position:sticky;top:0;z-index:10;box-shadow:0 2px 8px #0004}
+header h1{margin:0;font-size:22px} nav{margin-top:12px;display:flex;gap:10px;flex-wrap:wrap}
+nav button,.btn{border:0;border-radius:8px;padding:10px 14px;font-weight:bold;cursor:pointer;background:white;color:var(--blue)}
+nav button.active{background:#ffd166;color:#111}.btn.primary{background:var(--blue);color:white}.btn.green{background:var(--green);color:white}.btn.red{background:var(--danger);color:white}.btn.orange{background:var(--orange);color:white}.btn.gray{background:#6c757d;color:white}
+.page{display:none;padding:20px}.page.active{display:block}.card{background:white;border-radius:14px;padding:18px;margin-bottom:18px;box-shadow:0 2px 10px #0001}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.note{border-left:6px solid var(--cyan);padding:12px;background:#e9fbff;border-radius:8px}.matrix{width:100%;border-collapse:collapse}.matrix th,.matrix td{border:1px solid #ccd;padding:8px;text-align:center}.matrix th{background:#123;color:white}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}.table-wrap{overflow:auto;background:white;border-radius:12px;box-shadow:0 2px 10px #0001;max-height:72vh}
+table.data{border-collapse:separate;border-spacing:0;min-width:4200px;width:max-content} table.data th{position:sticky;top:0;background:#123;color:white;z-index:2;font-size:12px;resize:horizontal;overflow:auto;min-width:120px}
+table.data th,table.data td{border:1px solid #cfd7df;padding:6px;vertical-align:top} table.data td{background:white;min-width:120px} table.data tr:nth-child(even) td{background:#fbfdff}
+input,select,textarea{width:100%;border:1px solid #bac7d5;border-radius:6px;padding:7px;font-size:13px;background:white}textarea{min-height:42px;resize:vertical;overflow:hidden;white-space:pre-wrap;word-break:break-word}.small{font-size:12px;color:#555}.risk-low{background:#d1e7dd!important}.risk-medium-low{background:#fff3cd!important}.risk-medium{background:#ffe5b4!important}.risk-medium-high{background:#f8d7da!important}.risk-high{background:#f5b5bd!important;color:#5b0008}.highlight td{animation:flash 2s ease-in-out 1;background:#fff176!important}@keyframes flash{0%,100%{background:#fff176}50%{background:#ff9800}}
+.badge{padding:4px 8px;border-radius:12px;font-weight:bold;display:inline-block}.hidden{display:none} footer{text-align:center;color:#666;padding:15px}
+.dashboard{margin-top:18px}.dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}.dash-card{background:white;border-radius:12px;padding:14px;box-shadow:0 2px 10px #0001;border-left:6px solid var(--blue)}.dash-card h4{margin:0 0 8px 0;font-size:14px;color:var(--dark)}.dash-count{font-size:30px;font-weight:bold;color:var(--blue)}.bar{height:10px;background:#e5eaf0;border-radius:20px;overflow:hidden;margin-top:8px}.bar span{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--blue))}
+</style>
+</head>
+<body>
+<header>
+  <h1>AVSEC Quality Assurance Risk Assessment System</h1>
+  <nav>
+    <button onclick="showPage('home')" id="tab-home" class="active">Home</button>
+    <button onclick="showPage('qa')" id="tab-qa">Quality Assurance Risk Assessment</button>
+    <button onclick="showPage('register')" id="tab-register">Risk Register</button>
+  </nav>
+</header>
+
+<section id="home" class="page active">
+  <div class="card">
+    <h2>AVSEC Risk Assessment</h2>
+    <p>This web application is designed to record aviation security quality assurance risks, calculate risk scores, document immediate and corrective actions, determine residual risk after CAP, and transfer selected records to the final Risk Register.</p>
+    <div class="note"><b>ICAO based approach:</b> An aviation security risk assessment should be evidence-based and aligned with ICAO security management principles, considering threat likelihood, vulnerability, consequence/severity, existing controls, corrective action, monitoring, and periodic review. Use this tool as an operational QA risk tracking register.</div>
+  </div>
+  <div class="grid">
+    <div class="card"><h3>Methodology</h3><p><b>Risk Score = Probability × Severity × Vulnerability</b></p><p>The score is calculated on a 1–1000 scale and the system automatically assigns the risk tolerability level.</p></div>
+    <div class="card"><h3>Risk Tolerability</h3><p><span class="badge risk-low">Low</span> 1–80</p><p><span class="badge risk-medium-low">Medium Low</span> 81–200</p><p><span class="badge risk-medium">Medium</span> 201–400</p><p><span class="badge risk-medium-high">Medium High</span> 401–700</p><p><span class="badge risk-high">High</span> 701–1000</p></div>
+    <div class="card"><h3>QA Sources</h3><p>Findings identified through audits, inspections, tests, observations, and exercises can be recorded here for corrective action tracking and review.</p></div>
+  </div>
+  <div class="card">
+    <h3>Simple Risk Matrix</h3>
+    <table class="matrix"><tr><th>Level</th><th>Score Range</th><th>Required Action</th></tr><tr><td class="risk-low">Low</td><td>1–80</td><td>Accept with routine monitoring</td></tr><tr><td class="risk-medium-low">Medium Low</td><td>81–200</td><td>Improve controls where practical</td></tr><tr><td class="risk-medium">Medium</td><td>201–400</td><td>Corrective action required</td></tr><tr><td class="risk-medium-high">Medium High</td><td>401–700</td><td>Priority mitigation and management review</td></tr><tr><td class="risk-high">High</td><td>701–1000</td><td>Immediate action / senior management attention</td></tr></table>
+  </div>
+</section>
+
+<section id="qa" class="page">
+  <div class="toolbar">
+    <button class="btn primary" onclick="addQARow()">+ Add Row</button><button class="btn green" onclick="saveCloud()">Save to Google Sheet</button><button class="btn gray" onclick="loadCloud()">Load from Google Sheet</button><button class="btn orange" onclick="downloadTemplate()">Download Import Template</button><label class="btn gray">Import Excel<input type="file" id="importFile" accept=".xlsx,.xls" class="hidden" onchange="importExcel(event)"></label><button class="btn green" onclick="exportExcel('qa')">Export Excel</button><button class="btn red" onclick="clearQA()">Clear QA Table</button>
+    <span class="small">Column borders can be dragged to adjust width. Text areas auto-expand while typing.</span>
+  </div>
+  <div class="table-wrap"><table class="data" id="qaTable"><thead><tr id="qaHead"></tr></thead><tbody></tbody></table></div>
+  <div class="dashboard card">
+    <h2>Dashboard - Risk Count by Scope / Area</h2>
+    <div id="scopeDashboard" class="dash-grid"></div>
+  </div>
+</section>
+
+<section id="register" class="page">
+  <div class="toolbar"><button class="btn green" onclick="saveCloud()">Save to Google Sheet</button><button class="btn gray" onclick="loadCloud()">Load from Google Sheet</button><button class="btn green" onclick="exportExcel('register')">Export Excel</button><button class="btn red" onclick="clearRegister()">Clear Risk Register</button></div>
+  <div class="table-wrap"><table class="data" id="regTable"><thead><tr id="regHead"></tr></thead><tbody></tbody></table></div>
+</section>
+<footer>Google Sheet cloud sync enabled. Local browser backup is also kept.</footer>
+<script>
+const GOOGLE_SCRIPT_URL='https://script.google.com/macros/s/AKfycbz1VUrdC0Z8W8L69_nm-lS0gxr6HkxQkvoEgll3UmqIqp0KYyfxwuE37F9lR_067sAycQ/exec';
+const scoreOptions=[1,2,3,4,5,6,7,8,9,10];
+const ratingOptions=['Low - rated as 1 or 2','Medium Low - rated as 3 or 4','Medium - rated as 5 or 6','Medium High - rated as 7 or 8','High - rated as 9 or 10'];
+const riskOptions=['Low','Medium Low','Medium','Medium High','High'];
+const activityTypes=['Audit','Inspection','Test','Observation','Exercises'];
+const entities=['Internal Avsec QA','CAA-SL','CALs','CQ-UL','Other Entity','AASL'];
+const scopes=['Training of personal','Certification of personal','Access Permits - Control Area','Access Control','SRA / Tennent Area','Transfer Baggage','Hold Baggage Protection','Passenger & Cabin Baggage','Aircraft Security','Cargo & mail','Catering','Local Station Audits','Overseas Audit','Contingency Plan','Security Operation'];
+const qaCols=[
+ ['activityReference','Activity Reference','text'],['activityType','Activity Type','select',activityTypes],['entity','Entity','select',entities],['conductBy','Conduct By','text'],['scopeArea','Scope / Area','select',scopes],['date','Date','date'],['station','Station','text'],['riskId','Risk ID','text'],['identifyRisk','Identify AVSEC Risk','textarea'],['existingControl','Existing Control','textarea'],['immediateAction','Immediate Action Taken','textarea'],['probScore','Probability Score','select',scoreOptions],['probability','Probability','select',ratingOptions],['sevScore','Severity Score','select',scoreOptions],['severity','Severity','select',ratingOptions],['vulScore','Vulnerability Score','select',scoreOptions],['vulnerability','Vulnerability','select',ratingOptions],['riskScore','Risk Score','readonly'],['risk','Risk','select',riskOptions],['correctiveAction','Corrective Action','textarea'],['probScoreAfter','Probability Score After Cap','select',scoreOptions],['probAfter','Probability After Cap','select',ratingOptions],['sevScoreAfter','Severity Score After Cap','select',scoreOptions],['sevAfter','Severity After Cap','select',ratingOptions],['vulScoreAfter','Vulnerability Score After Cap','select',scoreOptions],['vulAfter','Vulnerability After Cap','select',ratingOptions],['riskScoreAfter','Risk Score After Cap','readonly'],['riskAfter','Risk After Cap','select',riskOptions],['actions','Actions','actions']
+];
+const regCols=[['riskId','Risk ID'],['sourceReference','Source Reference'],['identifyRisk','Identify AVSEC Risk'],['area','Area'],['tolerability','AVSEC Risk Tolerability'],['reviewAction','Review Risk & Mitigation Action'],['probability','Probability'],['severity','Severity'],['residualRisk','Residual Risk Tolerability'],['actions','Actions']];
+let qaData=JSON.parse(localStorage.getItem('qaData')||'[]');
+let regData=JSON.parse(localStorage.getItem('regData')||'[]');
+function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');}
+function init(){document.getElementById('qaHead').innerHTML=qaCols.map(c=>`<th>${c[1]}</th>`).join('');document.getElementById('regHead').innerHTML=regCols.map(c=>`<th>${c[1]}</th>`).join(''); if(!qaData.length)addQARow(false); renderQA();renderReg();}
+function ratingFromScore(s){s=Number(s); if(s<=2)return ratingOptions[0]; if(s<=4)return ratingOptions[1]; if(s<=6)return ratingOptions[2]; if(s<=8)return ratingOptions[3]; return ratingOptions[4];}
+function riskFromScore(s){s=Number(s)||0; if(s<=80)return 'Low'; if(s<=200)return 'Medium Low'; if(s<=400)return 'Medium'; if(s<=700)return 'Medium High'; return 'High';}
+function riskClass(v){return 'risk-'+String(v||'').toLowerCase().replaceAll(' ','-');}
+function renderDashboard(){
+  const box=document.getElementById('scopeDashboard');
+  if(!box)return;
+  const counts={};
+  scopes.forEach(s=>counts[s]=0);
+  qaData.forEach(r=>{if(r.scopeArea)counts[r.scopeArea]=(counts[r.scopeArea]||0)+1;});
+  const max=Math.max(1,...Object.values(counts));
+  box.innerHTML=Object.entries(counts).map(([area,count])=>`<div class="dash-card"><h4>${area}</h4><div class="dash-count">${count}</div><div class="small">Risk record(s)</div><div class="bar"><span style="width:${(count/max)*100}%"></span></div></div>`).join('');
+}
+function addQARow(render=true){qaData.push({riskId:'R-'+String(Date.now()).slice(-6),date:new Date().toISOString().slice(0,10)}); if(render)renderQA();}
+function renderQA(){const tb=document.querySelector('#qaTable tbody');tb.innerHTML='';qaData.forEach((r,i)=>{calcRow(r);let tr=document.createElement('tr');tr.id='qa-row-'+i;qaCols.forEach(c=>{let td=document.createElement('td');if(c[0]=='actions'){td.innerHTML=`<button class="btn green" onclick="sendToRegister(${i})">Send</button> <button class="btn red" onclick="deleteQARow(${i})">Delete</button>`}else if(c[2]=='select'){td.innerHTML=`<select onchange="updateQAAndRender(${i},'${c[0]}',this.value)">${['',...c[3]].map(o=>`<option ${String(r[c[0]]||'')==String(o)?'selected':''}>${o}</option>`).join('')}</select>`}else if(c[2]=='date'){td.innerHTML=`<input type="date" value="${r[c[0]]||''}" onchange="updateQA(${i},'${c[0]}',this.value)">`}else if(c[2]=='textarea'){td.innerHTML=`<textarea oninput="autoGrow(this);updateQA(${i},'${c[0]}',this.value)">${r[c[0]]||''}</textarea>`}else if(c[2]=='readonly'){td.className=riskClass(c[0]=='riskScore'?r.risk:r.riskAfter);td.innerHTML=`<b>${r[c[0]]||''}</b>`}else{td.innerHTML=`<input value="${r[c[0]]||''}" oninput="updateQA(${i},'${c[0]}',this.value)">`}tr.appendChild(td)});tb.appendChild(tr)});document.querySelectorAll('textarea').forEach(autoGrow);renderDashboard();saveAll(false)}
+function calcRow(r){['probScore','sevScore','vulScore','probScoreAfter','sevScoreAfter','vulScoreAfter'].forEach(k=>{if(r[k])r[k]=Number(r[k])}); if(r.probScore)r.probability=ratingFromScore(r.probScore); if(r.sevScore)r.severity=ratingFromScore(r.sevScore); if(r.vulScore)r.vulnerability=ratingFromScore(r.vulScore); r.riskScore=(Number(r.probScore)||0)*(Number(r.sevScore)||0)*(Number(r.vulScore)||0)||''; if(r.riskScore)r.risk=riskFromScore(r.riskScore); if(r.probScoreAfter)r.probAfter=ratingFromScore(r.probScoreAfter); if(r.sevScoreAfter)r.sevAfter=ratingFromScore(r.sevScoreAfter); if(r.vulScoreAfter)r.vulAfter=ratingFromScore(r.vulScoreAfter); r.riskScoreAfter=(Number(r.probScoreAfter)||0)*(Number(r.sevScoreAfter)||0)*(Number(r.vulScoreAfter)||0)||''; if(r.riskScoreAfter)r.riskAfter=riskFromScore(r.riskScoreAfter);}
+function updateQA(i,k,v){
+  qaData[i][k]=v;
+  calcRow(qaData[i]);
+  saveAll(false);
+  renderDashboard();
+}
+function updateQAAndRender(i,k,v){
+  qaData[i][k]=v;
+  calcRow(qaData[i]);
+  renderQA();
+}
+function deleteQARow(i){if(confirm('Delete this row?')){qaData.splice(i,1);renderQA();}}
+function sendToRegister(i){let r=qaData[i];calcRow(r);let item={riskId:r.riskId,sourceReference:r.activityReference,identifyRisk:r.identifyRisk,area:r.scopeArea,tolerability:r.riskAfter,reviewAction:r.correctiveAction,probability:r.probAfter||r.probability,severity:r.sevAfter||r.severity,residualRisk:r.riskAfter,sourceIndex:i};let ex=regData.findIndex(x=>x.riskId==r.riskId); if(ex>=0)regData[ex]=item; else regData.push(item);saveAll();renderReg();showPage('register');setTimeout(()=>{let row=document.getElementById('reg-'+item.riskId);if(row){row.scrollIntoView({behavior:'smooth',block:'center'});row.classList.add('highlight');}},200)}
+function renderReg(){const tb=document.querySelector('#regTable tbody');tb.innerHTML='';regData.forEach((r,i)=>{let tr=document.createElement('tr');tr.id='reg-'+r.riskId;regCols.forEach(c=>{let td=document.createElement('td');if(c[0]=='actions'){td.innerHTML=`<button class="btn primary" onclick="goSource(${r.sourceIndex})">Go Source</button> <button class="btn red" onclick="deleteReg(${i})">Delete</button>`}else if(c[0]=='riskId'){td.innerHTML=`<a href="#" onclick="goSource(${r.sourceIndex});return false"><b>${r.riskId||''}</b></a>`}else if(['reviewAction','probability','severity','residualRisk'].includes(c[0])){td.innerHTML=`<textarea oninput="autoGrow(this);updateReg(${i},'${c[0]}',this.value)">${r[c[0]]||''}</textarea>`; if(c[0]=='residualRisk')td.className=riskClass(r[c[0]])}else{td.textContent=r[c[0]]||''}tr.appendChild(td)});tb.appendChild(tr)});document.querySelectorAll('textarea').forEach(autoGrow);saveAll(false)}
+function goSource(i){showPage('qa');setTimeout(()=>{let row=document.getElementById('qa-row-'+i);if(row){row.scrollIntoView({behavior:'smooth',block:'center'});row.classList.add('highlight');setTimeout(()=>row.classList.remove('highlight'),2500)}},150)}
+function updateReg(i,k,v){regData[i][k]=v;saveAll(false)}function deleteReg(i){regData.splice(i,1);renderReg()}
+function saveAll(alertIt=true){localStorage.setItem('qaData',JSON.stringify(qaData));localStorage.setItem('regData',JSON.stringify(regData));if(alertIt)alert('Saved successfully in browser storage.');}
+async function saveCloud(){
+  qaData.forEach(calcRow);
+  saveAll(false);
+  const payload={qa:qaData,reg:regData,savedAt:new Date().toISOString()};
+  try{
+    await fetch(GOOGLE_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
+    alert('Saved to Google Sheet. Open the Sheet to confirm.');
+  }catch(err){
+    alert('Could not save to Google Sheet. Check internet connection and Apps Script deployment.');
+  }
+}
+function loadCloud(){
+  const cb='cloudCallback_'+Date.now();
+  window[cb]=function(data){
+    try{
+      qaData=Array.isArray(data.qa)?data.qa:[];
+      regData=Array.isArray(data.reg)?data.reg:[];
+      if(!qaData.length)addQARow(false);
+      saveAll(false);renderQA();renderReg();alert('Loaded from Google Sheet.');
+    }finally{delete window[cb];document.getElementById(cb)?.remove();}
+  };
+  const script=document.createElement('script');
+  script.id=cb;
+  script.src=GOOGLE_SCRIPT_URL+'?action=load&callback='+cb+'&t='+Date.now();
+  script.onerror=()=>alert('Could not load from Google Sheet. Check Apps Script code/deployment.');
+  document.body.appendChild(script);
+}
+
+function clearQA(){if(confirm('Clear all QA data?')){qaData=[];addQARow(false);renderQA();}}function clearRegister(){if(confirm('Clear Risk Register?')){regData=[];renderReg();}}
+function autoGrow(el){el.style.height='auto';el.style.height=(el.scrollHeight+4)+'px'}
+function exportExcel(type){let data,cols,name;if(type=='qa'){data=qaData.map(r=>{calcRow(r);let o={};qaCols.filter(c=>c[0]!='actions').forEach(c=>o[c[1]]=r[c[0]]||'');return o});name='QA_Risk_Assessment.xlsx'}else{data=regData.map(r=>{let o={};regCols.filter(c=>c[0]!='actions').forEach(c=>o[c[1]]=r[c[0]]||'');return o});name='Risk_Register.xlsx'}let ws=XLSX.utils.json_to_sheet(data);let wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,type=='qa'?'QA Risk Assessment':'Risk Register');XLSX.writeFile(wb,name)}
+function downloadTemplate(){let obj={};qaCols.filter(c=>c[0]!='actions').forEach(c=>obj[c[1]]='');let ws=XLSX.utils.json_to_sheet([obj]);let wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Import Template');XLSX.writeFile(wb,'AVSEC_QA_Import_Template.xlsx')}
+function importExcel(e){let f=e.target.files[0];if(!f)return;let reader=new FileReader();reader.onload=ev=>{let wb=XLSX.read(ev.target.result,{type:'binary'});let ws=wb.Sheets[wb.SheetNames[0]];let rows=XLSX.utils.sheet_to_json(ws);rows.forEach(row=>{let o={};qaCols.filter(c=>c[0]!='actions').forEach(c=>{o[c[0]]=row[c[1]]||''});qaData.push(o)});renderQA();alert('Imported successfully.');};reader.readAsBinaryString(f);}
+init();
+</script>
+</body>
+</html>
